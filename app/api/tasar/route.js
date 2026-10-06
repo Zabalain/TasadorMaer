@@ -11,7 +11,7 @@ REGLAS DE PROCESAMIENTO:
 4. Redondea los valores finales a bloques de 500€ o 1.000€ para un acabado profesional.
 5. Genera un resumen con aspectos clave a valorar (orientación, estado del edificio, eficiencia energética, necesidad de reforma).
 
-Devuelve estrictamente un JSON válido con este formato:
+Devuelve strictly un JSON válido:
 {
   "necesitaAclaracion": false,
   "valorEstimado": "XXX.XXX",
@@ -28,7 +28,7 @@ export async function POST(req) {
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "Falta la variable GEMINI_API_KEY en el entorno." },
+        { error: "Falta la variable GEMINI_API_KEY en el servidor." },
         { status: 500 }
       );
     }
