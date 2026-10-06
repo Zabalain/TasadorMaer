@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tasación Inmobiliaria Maer</title>
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--line:#e2e6ea;--ink:#14212b;--mute:#667583;--brand:#0f5c6e;--brand2:#e8f2f4;--red:#b42318;--amber:#a15c07;--green:#157347}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.45}
+.wrap{max-width:520px;margin:0 auto;padding:16px 16px 48px}
+h1{font-size:24px;margin:8px 0 2px;text-align:center}
+h1 span{color:var(--brand)}
+.sub{text-align:center;color:var(--mute);font-size:13px;margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--mute);margin:0 0 4px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #cfd6dc;border-radius:8px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
+.row{display:flex;gap:10px;margin-bottom:12px}
+.row>div{flex:1}
+.field{margin-bottom:12px}
+button{font:inherit;cursor:pointer}
+.primary{width:100%;padding:14px;border:0;border-radius:8px;background:var(--brand);color:#fff;font-weight:700;font-size:16px}
+.primary:disabled{background:#d5dce1;color:#8a97a2;cursor:default}
+.ghost{width:100%;padding:12px;border:1px solid #cfd6dc;border-radius:8px;background:#f6f8f9;font-weight:600}
+:focus-visible{outline:3px solid #7cc3d1;outline-offset:2px}
+.err{background:#fef3f2;border:1px solid #fecdca;color:var(--red);padding:12px;border-radius:8px;font-size:14px;margin-bottom:14px}
+.demo{background:#fff7e6;border:1px solid #f5d89a;color:var(--amber);padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:14px}
+.big{text-align:center;padding:20px 16px}
+.big small{display:block;font-size:12px;color:var(--mute)}
+.big strong{display:block;font-size:36px;letter-spacing:-.5px;margin:2px 0}
+.big .rango{font-size:14px;color:var(--mute)}
+.grid{display:flex;gap:8px;margin-bottom:14px}
+.mini{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 6px;text-align:center}
+.mini small{display:block;font-size:11px;color:var(--mute);line-height:1.2;margin-bottom:4px}
+.mini b{font-size:16px}
+.dem-ALTA{background:var(--green);color:#fff;border-color:var(--green)}.dem-MEDIA{background:#f2b705;color:#3b2a00;border-color:#f2b705}.dem-BAJA{background:var(--red);color:#fff;border-color:var(--red)}
+.dem-ALTA small,.dem-BAJA small{color:#fff;opacity:.9}.dem-MEDIA small{color:#3b2a00}
+.note{background:var(--brand2);border-left:4px solid var(--brand);padding:12px 14px;border-radius:0 10px 10px 0;font-size:14px;margin-bottom:14px}
+h2{font-size:13px;margin:0 0 10px}
+.fb{display:flex;gap:8px}
+.fb button{flex:1;padding:10px 4px;border-radius:6px;font-size:12px;font-weight:700;border:1px solid}
+.fb .a{background:#fee4e2;color:#7a271a;border-color:#fda29b}.fb .c{background:#dcfae6;color:#085d3a;border-color:#75e0a7}.fb .b{background:#fef0c7;color:#7a4d00;border-color:#fedf89}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:var(--mute);font-weight:600;padding:4px 4px 6px;border-bottom:1px solid var(--line)}
+td{padding:7px 4px;border-bottom:1px solid #f0f2f4;vertical-align:top}
+td.n,th.n{text-align:right;white-space:nowrap}
+.scroll{overflow-x:auto}
+a{color:var(--brand)}
+.trace{font-size:13px;color:#33444f}
+.trace p{margin:0 0 8px}
+.warn{color:var(--amber)}
+.hist{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto}
+.h{position:relative;border:1px solid #eef0f2;background:#f9fafb;border-radius:8px;padding:10px 30px 10px 10px;font-size:12px}
+.h b{display:block;font-size:13px;word-break:break-word}
+.h time{color:#8a97a2;font-size:11px}
+.h .x{position:absolute;top:6px;right:6px;border:0;background:none;color:#a6b0b8;font-size:14px}
+.h .ver{margin-top:6px;border:1px solid #cfd6dc;background:#fff;border-radius:6px;padding:4px 10px;font-size:12px}
+.tag{display:inline-block;margin-left:6px;background:#e0f2fe;color:#0369a1;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700}
+@media (prefers-reduced-motion:no-preference){.res{animation:in .25s ease-out}@keyframes in{from{opacity:0}to{opacity:1}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tasación Inmobiliaria <span>Maer</span></h1>
+  <p class="sub">Viviendas y locales · valoración trazable con anuncios comparables</p>
+
+  <div id="aviso"></div>
+
+  <form class="card" id="form">
+    <div class="row">
+      <div><label for="tipo">Tipo de inmueble</label>
+        <select id="tipo"><option value="vivienda">Vivienda</option><option value="local">Local comercial</option></select></div>
+      <div><label for="estado">Estado</label>
+        <select id="estado"><option value="reformar">A reformar</option><option value="bueno" selected>Buen estado</option><option value="reformado">Reformado / nuevo</option></select></div>
+    </div>
+    <div class="field"><label for="zona">Dirección o zona (calle, barrio, ciudad)</label>
+      <input id="zona" placeholder="Ej: Calle Mayor 12, Gijón" required></div>
+    <div class="row">
+      <div><label for="m2">Superficie (m²)</label><input id="m2" type="number" min="5" step="1" inputmode="numeric" placeholder="85" required></div>
+      <div id="habBox"><label for="hab">Habitaciones</label><input id="hab" type="number" min="0" step="1" inputmode="numeric" placeholder="3"></div>
+    </div>
+    <div class="field"><label for="notas">Notas (planta, ascensor, garaje, fachada del local…)</label>
+      <textarea id="notas" rows="2" placeholder="Ej: 3.º con ascensor, garaje incluido"></textarea></div>
+    <button class="primary" id="btn" type="submit">Realizar tasación</button>
+  </form>
+
+  <div id="error"></div>
+  <div id="resultado"></div>
+
+  <div class="card">
+    <h2>Histórico de tasaciones (<span id="cuenta">0</span>)</h2>
+    <input id="buscar" type="search" placeholder="Buscar por zona, tipo o fecha" style="margin-bottom:10px;font-size:14px">
+    <div class="hist" id="hist"></div>
+  </div>
+</div>
+
+<script>
+/* ===== CONFIGURACIÓN ===== */
+const API_URL = '/api/tasar';   // Endpoint de tu servidor (ver contrato al final)
+const MODO_DEMO = false;        // false = consulta real vía /api/tasar. Pon true para probar solo la interfaz con datos simulados.
+const KEY = 'historial_tasaciones_inmobiliarias';
+
+/* ===== UTILIDADES ===== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const eur = n => Math.round(n).toLocaleString('es-ES') + ' €';
+const mediana = a => { const s=[...a].sort((x,y)=>x-y), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+let historial = [];
+let idActual = null;
+try { historial = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e) { historial = []; }
+const guardar = () => { try { localStorage.setItem(KEY, JSON.stringify(historial)); } catch(e) {} };
+
+$('aviso').innerHTML = MODO_DEMO ? '<div class="demo"><b>Modo demostración:</b> los precios y anuncios son simulados para probar la interfaz. No son datos reales de ningún portal.</div>' : '';
+$('tipo').addEventListener('change', () => { $('habBox').style.display = $('tipo').value === 'local' ? 'none' : ''; });
+
+/* ===== CALIBRACIÓN (igual que en el tasador de vehículos) ===== */
+function calibracion() {
+  const u = historial.slice(0, 10).map(h => h.feedback).filter(f => f && f !== 'Sin ajustar');
+  const altos = u.filter(f => f.includes('Alto')).length, bajos = u.filter(f => f.includes('Bajo')).length;
+  return { altos, bajos, ajustePct: altos > bajos ? -5 : bajos > altos ? 5 : 0 };
+}
+
+/* ===== DATOS DE DEMOSTRACIÓN ===== */
+function simular(d) {
+  let seed = 0; for (const c of d.zona.toLowerCase()) seed = (seed * 31 + c.charCodeAt(0)) >>> 0;
+  const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+  const base = (d.tipo === 'local' ? 1400 : 2100) * (0.7 + rnd() * 0.9);
+  const factor = { reformar: 0.82, bueno: 1, reformado: 1.15 }[d.estado];
+  const portales = ['Idealista', 'Fotocasa', 'Habitaclia', 'pisos.com'];
+  const comparables = Array.from({ length: 8 }, (_, i) => {
+    const m2 = Math.max(15, Math.round(d.m2 * (0.75 + rnd() * 0.5)));
+    const pm2 = base * factor * (0.9 + rnd() * 0.2);
+    return { portal: portales[i % 4], url: null, titulo: (d.tipo === 'local' ? 'Local' : 'Vivienda') + ' simulado ' + (i + 1),
+      precio: Math.round(pm2 * m2 / 1000) * 1000, m2, habitaciones: d.tipo === 'local' ? null : Math.max(1, Math.round(d.habitaciones || 3) + (i % 3) - 1),
+      fecha: new Date(Date.now() - rnd() * 40 * 864e5).toISOString().slice(0, 10) };
+  });
+  return respuestaDesde(comparables, d, 'Datos simulados: sustituir por la consulta real a portales.');
+}
+
+/* Calcula la valoración a partir de los comparables (misma lógica que debe seguir el servidor) */
+function respuestaDesde(comparables, d, extra) {
+  const pm2s = comparables.map(c => c.precio / c.m2);
+  const med = mediana(pm2s);
+  const cal = calibracion();
+  const ajuste = 1 + cal.ajustePct / 100;
+  const descuentoNegociacion = 0.93; // los anuncios son precio pedido, no precio de cierre
+  const valor = med * d.m2 * descuentoNegociacion * ajuste;
+  const disp = Math.sqrt(pm2s.reduce((s, x) => s + (x - med) ** 2, 0) / pm2s.length) / med;
+  return {
+    precioTasacion: valor, rangoMin: valor * (1 - Math.max(.06, disp)), rangoMax: valor * (1 + Math.max(.06, disp)),
+    precioM2: med * descuentoNegociacion * ajuste, precioMedioAnuncios: comparables.reduce((s, c) => s + c.precio, 0) / comparables.length,
+    fiabilidad: disp < .08 ? 'ALTA' : disp < .14 ? 'MEDIA' : 'BAJA',
+    resumen: d.tipo === 'local'
+      ? 'Comprobar licencia de actividad, salida de humos, accesibilidad, fachada, instalación eléctrica y cargas registrales.'
+      : 'Comprobar cédula de habitabilidad / certificado energético, estado de instalaciones, derramas de la comunidad, cargas registrales y orientación.',
+    metodologia: { fuentes: [...new Set(comparables.map(c => c.portal))], nComparables: comparables.length, medianaPrecioM2Anuncio: med,
+      descuentoNegociacion: 7, ajusteCalibracionPct: cal.ajustePct, nota: extra || '' },
+    comparables, fechaConsulta: new Date().toISOString()
+  };
+}
+
+/* ===== TASAR ===== */
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const d = { tipo: $('tipo').value, estado: $('estado').value, zona: $('zona').value.trim(), m2: +$('m2').value,
+    habitaciones: $('hab').value ? +$('hab').value : null, notas: $('notas').value.trim() };
+  if (!d.zona || !d.m2) return;
+  $('btn').disabled = true; $('btn').textContent = 'Consultando portales…'; $('error').innerHTML = '';
+  try {
+    let r;
+    if (MODO_DEMO) { await new Promise(ok => setTimeout(ok, 600)); r = simular(d); }
+    else {
+      const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...d, calibracion: calibracion() }) });
+      r = await res.json();
+      if (r.error) throw new Error(r.error);
+    }
+    const item = { id: Date.now(), fecha: new Date().toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      inmueble: `${d.tipo === 'local' ? 'Local' : 'Vivienda'} · ${d.zona} · ${d.m2} m²`, feedback: 'Sin ajustar', resultado: r };
+    historial.unshift(item); idActual = item.id; guardar();
+    pintar(r, item); pintarHistorial();
+  } catch (err) {
+    $('error').innerHTML = '<div class="err">' + esc(err.message || 'Error al conectar con el servidor.') + '</div>';
+  } finally { $('btn').disabled = false; $('btn').textContent = 'Realizar tasación'; }
+});
+
+/* ===== RESULTADO ===== */
+function pintar(r, item) {
+  const m = r.metodologia || {}, cs = r.comparables || [];
+  const recalc = cs.length ? mediana(cs.map(c => c.precio / c.m2)) : null;
+  const desvia = recalc && m.medianaPrecioM2Anuncio && Math.abs(recalc - m.medianaPrecioM2Anuncio) / recalc > .03;
+  const filas = cs.map(c => `<tr><td>${c.url ? `<a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.portal)}</a>` : esc(c.portal)}</td>
+    <td class="n">${eur(c.precio)}</td><td class="n">${c.m2}</td><td class="n">${Math.round(c.precio / c.m2).toLocaleString('es-ES')}</td><td>${esc(c.fecha || '')}</td></tr>`).join('');
+  const fb = item.feedback !== 'Sin ajustar';
+  $('resultado').innerHTML = `<div class="res">
+    <div class="card big"><small>Valor de tasación estimado</small><strong>${eur(r.precioTasacion)}</strong>
+      <span class="rango">Rango: ${eur(r.rangoMin)} – ${eur(r.rangoMax)}</span></div>
+    <div class="grid">
+      <div class="mini"><small>€/m² aplicado</small><b>${Math.round(r.precioM2).toLocaleString('es-ES')}</b></div>
+      <div class="mini"><small>Precio medio de los anuncios</small><b>${eur(r.precioMedioAnuncios)}</b></div>
+      <div class="mini dem-${esc(r.fiabilidad)}"><small>Fiabilidad de la muestra</small><b>${esc(r.fiabilidad)}</b></div>
+    </div>
+    <div class="card"><h2>¿Valor adecuado al mercado real? (calibra la tasación)</h2>
+      ${fb ? `<span class="tag" style="margin:0">Marcado como: ${esc(item.feedback)}</span>` : `<div class="fb">
+        <button type="button" class="a" onclick="votar('Demasiado Alto 📈')">Demasiado alto</button>
+        <button type="button" class="c" onclick="votar('Correcto ✅')">Correcto</button>
+        <button type="button" class="b" onclick="votar('Demasiado Bajo 📉')">Demasiado bajo</button></div>`}</div>
+    <div class="note"><b>Puntos críticos de revisión:</b><br>${esc(r.resumen)}</div>
+    <div class="card"><h2>Comparables utilizados (${cs.length})</h2>
+      <div class="scroll"><table><thead><tr><th>Portal</th><th class="n">Precio</th><th class="n">m²</th><th class="n">€/m²</th><th>Fecha</th></tr></thead><tbody>${filas}</tbody></table></div></div>
+    <div class="card trace"><h2>Cómo se ha calculado</h2>
+      <p>Fuentes: ${esc((m.fuentes || []).join(', '))}. Consulta: ${esc(new Date(r.fechaConsulta).toLocaleString('es-ES'))}.</p>
+      <p>1. Mediana del €/m² de los ${m.nComparables} anuncios: <b>${Math.round(m.medianaPrecioM2Anuncio).toLocaleString('es-ES')} €/m²</b>.<br>
+         2. Descuento por diferencia entre precio pedido y de cierre: <b>−${m.descuentoNegociacion}%</b>.<br>
+         3. Ajuste por tus correcciones anteriores: <b>${m.ajusteCalibracionPct > 0 ? '+' : ''}${m.ajusteCalibracionPct}%</b>.<br>
+         4. Valor = €/m² resultante × superficie.</p>
+      ${recalc ? `<p>Comprobación en este navegador a partir de la tabla: ${Math.round(recalc).toLocaleString('es-ES')} €/m². ${desvia ? '<span class="warn">No coincide con el dato del servidor: revisar.</span>' : 'Coincide con el servidor.'}</p>` : ''}
+      ${m.nota ? `<p class="warn">${esc(m.nota)}</p>` : ''}</div>
+    <button type="button" class="ghost" onclick="limpiar()">Borrar pantalla para otro inmueble</button>
+  </div>`;
+}
+
+function votar(tipo) {
+  const it = historial.find(h => h.id === idActual); if (!it) return;
+  it.feedback = tipo; guardar(); pintar(it.resultado, it); pintarHistorial();
+}
+function limpiar() { $('resultado').innerHTML = ''; $('form').reset(); $('habBox').style.display = ''; idActual = null; }
+function ver(id) { const it = historial.find(h => h.id === id); if (!it) return; idActual = id; pintar(it.resultado, it); scrollTo({ top: 0 }); }
+function borrar(id) { if (confirm('¿Eliminar esta tasación del histórico?')) { historial = historial.filter(h => h.id !== id); guardar(); pintarHistorial(); } }
+
+/* ===== HISTORIAL ===== */
+function pintarHistorial() {
+  const q = $('buscar').value.toLowerCase();
+  const lista = historial.filter(h => h.inmueble.toLowerCase().includes(q) || h.fecha.toLowerCase().includes(q));
+  $('cuenta').textContent = historial.length;
+  $('hist').innerHTML = lista.length ? lista.map(h => `<div class="h"><button class="x" onclick="borrar(${h.id})" title="Eliminar" aria-label="Eliminar">✕</button>
+    <time>${esc(h.fecha)}</time><b>${esc(h.inmueble)}</b>
+    Valor: <b style="display:inline">${eur(h.resultado.precioTasacion)}</b> (${eur(h.resultado.rangoMin)} – ${eur(h.resultado.rangoMax)})
+    ${h.feedback !== 'Sin ajustar' ? `<span class="tag">${esc(h.feedback)}</span>` : ''}<br>
+    <button class="ver" onclick="ver(${h.id})">Ver detalle y comparables</button></div>`).join('')
+    : '<p style="text-align:center;color:#8a97a2;font-size:12px;margin:16px 0">No hay registros en el histórico.</p>';
+}
+$('buscar').addEventListener('input', pintarHistorial);
+pintarHistorial();
+
+/* ===== CONTRATO DEL ENDPOINT /api/tasar (cuando MODO_DEMO = false) =====
+Entrada (POST JSON): { tipo, estado, zona, m2, habitaciones, notas, calibracion:{altos,bajos,ajustePct} }
+Salida: { precioTasacion, rangoMin, rangoMax, precioM2, precioMedioAnuncios, fiabilidad:'ALTA|MEDIA|BAJA', resumen,
+  metodologia:{ fuentes[], nComparables, medianaPrecioM2Anuncio, descuentoNegociacion, ajusteCalibracionPct, nota },
+  comparables:[{ portal, url, titulo, precio, m2, habitaciones, fecha }], fechaConsulta }
+O bien { error: "mensaje" } */
+</script>
+</body>
+</html>
