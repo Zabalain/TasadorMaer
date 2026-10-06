@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const SYSTEM_PROMPT = `Eres un experto en valoración e informe de tasación inmobiliaria en España. 
 Tu función es analizar los datos de la propiedad introducidos por el usuario (ubicación, superficie m2, habitaciones, estado, tipo de inmueble) y generar una estimación razonada de mercado.
@@ -11,7 +11,7 @@ REGLAS DE PROCESAMIENTO:
 4. Redondea los valores finales a bloques de 500€ o 1.000€ para un acabado profesional.
 5. Genera un resumen con aspectos clave a valorar (orientación, estado del edificio, eficiencia energética, necesidad de reforma).
 
-Devuelve strictly un JSON válido:
+Devuelve estrictamente un JSON válido con este formato:
 {
   "necesitaAclaracion": false,
   "valorEstimado": "XXX.XXX",
@@ -28,28 +28,32 @@ export async function POST(req) {
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "Falta la variable GEMINI_API_KEY en el servidor." },
+        { error: "Falta la variable GEMINI_API_KEY en las variables de entorno de Vercel." },
         { status: 500 }
       );
     }
 
-    const ai = new GoogleGenAI({ apiKey });
-
-    const response = await ai.models.generateContent({
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
-      contents: `Analiza y realiza la tasación inmobiliaria para: ${query}`,
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
+      generationConfig: {
         responseMimeType: "application/json",
         temperature: 0.0,
       },
+      systemInstruction: SYSTEM_PROMPT,
     });
 
-    const data = JSON.parse(response.text.trim());
+    const result = await model.generateContent(
+      `Analiza y realiza la tasación inmobiliaria para: ${query}`
+    );
+
+    const responseText = result.response.text();
+    const data = JSON.parse(responseText.trim());
+
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
-      { error: "Error en la tasación inmobiliaria: " + error.message },
+      { error: "Error en el servidor de tasación: " + error.message },
       { status: 500 }
     );
   }
