@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 
+export const dynamic = "force-dynamic";
+
 const SYSTEM_PROMPT = `Eres un motor experto en valoración e informe de tasación inmobiliaria en España.
 Tu tarea es analizar los datos de la propiedad introducidos por el usuario y generar una estimación de mercado razonada y trazable.
 
-Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exacta (sin formato Markdown, sin texto adicional):
+Devuelve EXCLUSIVAMENTE un objeto JSON válido (sin etiquetas markdown, sin texto antes ni después) con esta estructura exacta:
 
 {
   "precioTasacion": 210000,
@@ -36,13 +38,10 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exact
   "fechaConsulta": "2026-10-07T12:00:00.000Z"
 }
 
-REGLAS DE PROCESAMIENTO:
-1. Extrae m2, estado de conservación, ubicación/zona y habitaciones.
-2. Determina un valor realista de mercado ajustado a la zona de España indicada.
-3. El campo 'fiabilidad' debe ser estrictamente uno de estos tres valores: "ALTA", "MEDIA" o "BAJA".
-4. Genera entre 4 y 8 comparables verosímiles adaptados a la zona del inmueble para justificar la muestra.
-5. Los precios finales deben estar redondeados para un acabado profesional.
-`;
+REGLAS:
+1. 'fiabilidad' solo puede ser "ALTA", "MEDIA" o "BAJA".
+2. Incluye entre 4 y 8 comparables verosímiles adaptados a la zona.
+3. Precios redondeados.`;
 
 export async function POST(req) {
   try {
@@ -51,24 +50,23 @@ export async function POST(req) {
 
     if (!apiKey) {
       return NextResponse.json(
-        { error: "Falta la variable GEMINI_API_KEY en las variables de entorno de Vercel." },
+        { error: "Falta la variable GEMINI_API_KEY en Vercel." },
         { status: 500 }
       );
     }
 
     const ai = new GoogleGenAI({ apiKey });
 
-    const promptUsuario = `Realiza la tasación del siguiente inmueble:
+    const promptUsuario = `Tasación inmobiliaria:
 - Tipo: ${body.tipo || 'vivienda'}
 - Estado: ${body.estado || 'bueno'}
 - Ubicación/Zona: ${body.zona}
 - Superficie: ${body.m2} m²
 - Habitaciones: ${body.habitaciones || 'No especificado'}
-- Notas adicionales: ${body.notas || 'Ninguna'}
-- Ajuste por calibración del usuario: ${body.calibracion?.ajustePct || 0}%`;
+- Notas: ${body.notas || 'Ninguna'}`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
+      model: "gemini-2.0-flash",
       contents: promptUsuario,
       config: {
         systemInstruction: SYSTEM_PROMPT,
@@ -76,15 +74,18 @@ export async function POST(req) {
       },
     });
 
-    if (!response?.text) {
-      throw new Error("Respuesta vacía del servidor de IA.");
+    const rawText = response?.text || "";
+    const jsonString = rawText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+
+    if (!jsonString) {
+      throw new Error("Respuesta vacía de la API de Gemini.");
     }
 
-    const data = JSON.parse(response.text.trim());
+    const data = JSON.parse(jsonString);
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
-      { error: "Error en la tasación inmobiliaria: " + error.message },
+      { error: "Error en la tasación: " + (error.message || "Error al procesar la respuesta.") },
       { status: 500 }
     );
   }
