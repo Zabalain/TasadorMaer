@@ -67,29 +67,17 @@ export async function POST(req) {
 - Notas adicionales: ${body.notas || 'Ninguna'}
 - Ajuste por calibración del usuario: ${body.calibracion?.ajustePct || 0}%`;
 
-    // Intentamos con gemini-3.8-flash o gemini-2.0-flash
-    let response;
-    const modelCandidates = ["gemini-3.8-flash", "gemini-2.0-flash"];
-    let lastError = null;
-
-    for (const modelName of modelCandidates) {
-      try {
-        response = await ai.models.generateContent({
-          model: modelName,
-          contents: promptUsuario,
-          config: {
-            systemInstruction: SYSTEM_PROMPT,
-            responseMimeType: "application/json",
-          },
-        });
-        if (response?.text) break;
-      } catch (err) {
-        lastError = err;
-      }
-    }
+    const response = await ai.models.generateContent({
+      model: "gemini-3.8-flash",
+      contents: promptUsuario,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        responseMimeType: "application/json",
+      },
+    });
 
     if (!response?.text) {
-      throw lastError || new Error("No se pudo obtener respuesta del modelo.");
+      throw new Error("Respuesta vacía del servidor de IA.");
     }
 
     const data = JSON.parse(response.text.trim());
