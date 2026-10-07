@@ -37,7 +37,7 @@ Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exact
 }
 
 REGLAS DE PROCESAMIENTO:
-1. Extrae los metros cuadrados (m2), estado de conservación, ubicación/zona y habitaciones.
+1. Extrae m2, estado de conservación, ubicación/zona y habitaciones.
 2. Determina un valor realista de mercado ajustado a la zona de España indicada.
 3. El campo 'fiabilidad' debe ser estrictamente uno de estos tres valores: "ALTA", "MEDIA" o "BAJA".
 4. Genera entre 4 y 8 comparables verosímiles adaptados a la zona del inmueble para justificar la muestra.
