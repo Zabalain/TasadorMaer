@@ -1,29 +1,52 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
-const SYSTEM_PROMPT = `Eres un experto en valoración e informe de tasación inmobiliaria en España. 
-Tu función es analizar los datos de la propiedad introducidos por el usuario (ubicación, superficie m2, habitaciones, estado, tipo de inmueble) y generar una estimación razonada de mercado.
+const SYSTEM_PROMPT = `Eres un motor experto en valoración e informe de tasación inmobiliaria en España.
+Tu tarea es analizar los datos de la propiedad introducidos por el usuario y generar una estimación de mercado razonada y trazable.
+
+Devuelve EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura exacta (sin formato Markdown, sin texto adicional):
+
+{
+  "precioTasacion": 210000,
+  "rangoMin": 195000,
+  "rangoMax": 225000,
+  "precioM2": 2100,
+  "precioMedioAnuncios": 2250,
+  "fiabilidad": "ALTA",
+  "resumen": "Resumen técnico de puntos críticos de revisión para la propiedad.",
+  "metodologia": {
+    "fuentes": ["Idealista", "Fotocasa", "Habitaclia"],
+    "nComparables": 6,
+    "medianaPrecioM2Anuncio": 2250,
+    "descuentoNegociacion": 7,
+    "ajusteCalibracionPct": 0,
+    "nota": "Estimación calculada mediante análisis comparativo de mercado."
+  },
+  "comparables": [
+    {
+      "portal": "Idealista",
+      "url": null,
+      "titulo": "Inmueble comparable 1",
+      "precio": 215000,
+      "m2": 85,
+      "habitaciones": 3,
+      "fecha": "2026-10-01"
+    }
+  ],
+  "fechaConsulta": "2026-10-07T12:00:00.000Z"
+}
 
 REGLAS DE PROCESAMIENTO:
-1. Extrae m2, municipio/zona, número de habitaciones, baños y conservación.
-2. Determina un precio estimado por m2 acorde al mercado de la zona.
-3. Calcula el valor total de mercado estimado y aplica un rango comercial (mínimo - máximo).
-4. Redondea los valores finales a bloques de 500€ o 1.000€ para un acabado profesional.
-5. Genera un resumen con aspectos clave a valorar (orientación, estado del edificio, eficiencia energética, necesidad de reforma).
-
-Devuelve estrictamente un JSON válido con este formato:
-{
-  "necesitaAclaracion": false,
-  "valorEstimado": "XXX.XXX",
-  "valorMinimo": "XXX.XXX",
-  "valorMaximo": "XXX.XXX",
-  "precioMetroCuadrado": "X.XXX",
-  "resumen": "Análisis y factores clave a revisar en la inspección de la propiedad."
-}`;
+1. Extrae los metros cuadrados (m2), estado de conservación, ubicación/zona y habitaciones.
+2. Determina un valor realista de mercado ajustado a la zona de España indicada.
+3. El campo 'fiabilidad' debe ser estrictamente uno de estos tres valores: "ALTA", "MEDIA" o "BAJA".
+4. Genera entre 4 y 8 comparables verosímiles adaptados a la zona del inmueble para justificar la muestra.
+5. Los precios finales deben estar redondeados para un acabado profesional.
+`;
 
 export async function POST(req) {
   try {
-    const { query } = await req.json();
+    const body = await req.json();
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -33,27 +56,32 @@ export async function POST(req) {
       );
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
+    const ai = new GoogleGenAI({ apiKey });
+
+    const promptUsuario = `Realiza la tasación del siguiente inmueble:
+- Tipo: ${body.tipo || 'vivienda'}
+- Estado: ${body.estado || 'bueno'}
+- Ubicación/Zona: ${body.zona}
+- Superficie: ${body.m2} m²
+- Habitaciones: ${body.habitaciones || 'No especificado'}
+- Notas adicionales: ${body.notas || 'Ninguna'}
+- Ajuste por calibración del usuario: ${body.calibracion?.ajustePct || 0}%`;
+
+    const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
-      generationConfig: {
+      contents: promptUsuario,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
         responseMimeType: "application/json",
-        temperature: 0.0,
+        temperature: 0.1,
       },
-      systemInstruction: SYSTEM_PROMPT,
     });
 
-    const result = await model.generateContent(
-      `Analiza y realiza la tasación inmobiliaria para: ${query}`
-    );
-
-    const responseText = result.response.text();
-    const data = JSON.parse(responseText.trim());
-
+    const data = JSON.parse(response.text.trim());
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
-      { error: "Error en el servidor de tasación: " + error.message },
+      { error: "Error en la tasación inmobiliaria: " + error.message },
       { status: 500 }
     );
   }
