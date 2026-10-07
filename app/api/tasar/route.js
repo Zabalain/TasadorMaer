@@ -68,7 +68,7 @@ export async function POST(req) {
 - Ajuste por calibración del usuario: ${body.calibracion?.ajustePct || 0}%`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash-latest",
+      model: "gemini-2.5-flash",
       contents: promptUsuario,
       config: {
         systemInstruction: SYSTEM_PROMPT,
