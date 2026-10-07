@@ -65,21 +65,36 @@ export async function POST(req) {
 - Habitaciones: ${body.habitaciones || 'No especificado'}
 - Notas: ${body.notas || 'Ninguna'}`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
-      contents: promptUsuario,
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        responseMimeType: "application/json",
-      },
-    });
+    let response = null;
+    let lastError = null;
 
-    const rawText = response?.text || "";
-    const jsonString = rawText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-
-    if (!jsonString) {
-      throw new Error("Respuesta vacía de la API de Gemini.");
+    // Reintento con una pequeña pausa si la API reporta saturación (503)
+    for (let intento = 0; intento < 2; intento++) {
+      try {
+        response = await ai.models.generateContent({
+          model: "gemini-3.8-flash",
+          contents: promptUsuario,
+          config: {
+            systemInstruction: SYSTEM_PROMPT,
+            responseMimeType: "application/json",
+          },
+        });
+        if (response?.text) break;
+      } catch (err) {
+        lastError = err;
+        // Esperamos 1.5 segundos antes de reintentar si el servidor de Google está ocupado
+        if (intento === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
+      }
     }
+
+    if (!response?.text) {
+      throw lastError || new Error("El servicio de IA no se encuentra disponible temporalmente por alta demanda.");
+    }
+
+    const rawText = response.text;
+    const jsonString = rawText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
 
     const data = JSON.parse(jsonString);
     return NextResponse.json(data);
