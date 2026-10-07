@@ -67,9 +67,9 @@ export async function POST(req) {
 - Notas adicionales: ${body.notas || 'Ninguna'}
 - Ajuste por calibración del usuario: ${body.calibracion?.ajustePct || 0}%`;
 
-    // Intentamos con gemini-2.0-flash o gemini-1.5-flash según disponibilidad
+    // Intentamos con gemini-3.8-flash o gemini-2.0-flash
     let response;
-    const modelCandidates = ["gemini-2.0-flash", "gemini-1.5-flash"];
+    const modelCandidates = ["gemini-3.8-flash", "gemini-2.0-flash"];
     let lastError = null;
 
     for (const modelName of modelCandidates) {
@@ -80,7 +80,6 @@ export async function POST(req) {
           config: {
             systemInstruction: SYSTEM_PROMPT,
             responseMimeType: "application/json",
-            temperature: 0.1,
           },
         });
         if (response?.text) break;
