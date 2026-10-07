@@ -67,15 +67,31 @@ export async function POST(req) {
 - Notas adicionales: ${body.notas || 'Ninguna'}
 - Ajuste por calibración del usuario: ${body.calibracion?.ajustePct || 0}%`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: promptUsuario,
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        responseMimeType: "application/json",
-        temperature: 0.1,
-      },
-    });
+    // Intentamos con gemini-2.0-flash o gemini-1.5-flash según disponibilidad
+    let response;
+    const modelCandidates = ["gemini-2.0-flash", "gemini-1.5-flash"];
+    let lastError = null;
+
+    for (const modelName of modelCandidates) {
+      try {
+        response = await ai.models.generateContent({
+          model: modelName,
+          contents: promptUsuario,
+          config: {
+            systemInstruction: SYSTEM_PROMPT,
+            responseMimeType: "application/json",
+            temperature: 0.1,
+          },
+        });
+        if (response?.text) break;
+      } catch (err) {
+        lastError = err;
+      }
+    }
+
+    if (!response?.text) {
+      throw lastError || new Error("No se pudo obtener respuesta del modelo.");
+    }
 
     const data = JSON.parse(response.text.trim());
     return NextResponse.json(data);
